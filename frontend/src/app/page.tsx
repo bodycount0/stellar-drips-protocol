@@ -3,11 +3,13 @@
 /**
  * page.tsx — Home page
  *
- * Renders the wallet connect/disconnect button and the subscription form.
+ * Renders the wallet connect/disconnect button, the subscription form,
+ * and the on-chain event history viewer.
  * Requirements: 9.1, 9.5, 9.6, 10.1
  */
 
 import SubscriptionForm from '@/components/SubscriptionForm';
+import EventHistory from '@/components/EventHistory';
 import { useWallet } from '@/hooks/useWallet';
 
 export default function Home() {
@@ -104,6 +106,11 @@ export default function Home() {
           Connect your wallet above to create a subscription.
         </div>
       )}
+
+      {/* Event history — always visible as a public on-chain viewer */}
+      <div className="w-full mt-12">
+        <EventHistory />
+      </div>
     </main>
   );
 }
