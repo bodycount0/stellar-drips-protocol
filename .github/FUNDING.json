@@ -1,0 +1,18 @@
+{
+  "drips": {
+    "blockchain": "stellar",
+    "maintainers": [
+      {
+        "address": "GAUPZN3SFJQD3VNVEY6Z7NYPW7FGV336PTJBGMOIJTKQHPBW6RTNDQZD",
+        "weight": 100,
+        "role": "lead-maintainer"
+      }
+    ]
+  },
+  "stellar": {
+    "address": "GAUPZN3SFJQD3VNVEY6Z7NYPW7FGV336PTJBGMOIJTKQHPBW6RTNDQZD"
+  },
+  "custom": [
+    "https://github.com/bodycount0/stellar-drips-protocol"
+  ]
+}
