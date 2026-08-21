@@ -180,3 +180,4 @@ npm run type-check
 ## License
 
 MIT
+# bounty-fix-ref: https://github.com/bodycount0/stellar-drips-protocol/issues/4
