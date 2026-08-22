@@ -8,6 +8,7 @@
  */
 
 import SubscriptionForm from '@/components/SubscriptionForm';
+import EventHistory from '@/components/EventHistory';
 import { useWallet } from '@/hooks/useWallet';
 
 export default function Home() {
@@ -98,12 +99,16 @@ export default function Home() {
 
       {/* Subscription form — only rendered when wallet is connected (Req 9.5) */}
       {publicKey ? (
-        <SubscriptionForm />
+        <>
+          <SubscriptionForm />
+          <EventHistory userAddress={publicKey} />
+        </>
       ) : (
         <div className="w-full max-w-lg rounded-2xl border border-gray-800 bg-gray-900/40 p-8 text-center text-gray-500 text-sm">
           Connect your wallet above to create a subscription.
         </div>
       )}
+      {!publicKey && <EventHistory />}
     </main>
   );
 }
