@@ -3,20 +3,28 @@
 /**
  * WalletContext.tsx
  *
- * React context for Freighter wallet state.
+ * React context for Freighter wallet state with mobile browser deep-link support.
  * Wrap the app in <WalletProvider> to make wallet state available
  * to all child components via useWallet().
  *
- * Requirements: 9.1–9.6
+ * Requirements: 9.1–9.6 + Mobile deep-linking
  */
 
 import React, {
   createContext,
   useCallback,
+  useEffect,
   useState,
   type ReactNode,
 } from 'react';
-import { connectWallet, detectFreighter } from '@/lib/wallet_manager';
+import {
+  connectWallet,
+  detectFreighter,
+  isMobileDevice,
+  getConnectionMethod,
+  getFreighterDeepLink,
+  type ConnectionMethod,
+} from '@/lib/wallet_manager';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -29,7 +37,13 @@ export interface WalletContextValue {
   connectError: string | null;
   /** True when Freighter extension is detected in the browser. */
   freighterInstalled: boolean;
-  /** Trigger wallet connection — opens Freighter permission dialog. */
+  /** True when client is running on a mobile browser (iOS, Android). */
+  isMobile: boolean;
+  /** Active connection strategy: 'extension' | 'deep-link' | 'none' */
+  connectionMethod: ConnectionMethod;
+  /** Deep link URL to launch Freighter mobile application */
+  deepLinkUrl: string;
+  /** Trigger wallet connection — opens Freighter permission dialog or mobile app. */
   connect: () => Promise<void>;
   /** Clear publicKey and return to disconnected state. */
   disconnect: () => void;
@@ -45,16 +59,44 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [publicKey, setPublicKey] = useState<string | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
-  const [freighterInstalled, setFreighterInstalled] = useState(true);
+  const [freighterInstalled, setFreighterInstalled] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [connectionMethod, setConnectionMethod] = useState<ConnectionMethod>('none');
+  const [deepLinkUrl, setDeepLinkUrl] = useState('');
+
+  useEffect(() => {
+    const mobile = isMobileDevice();
+    setIsMobile(mobile);
+    setDeepLinkUrl(getFreighterDeepLink());
+
+    detectFreighter().then((installed) => {
+      setFreighterInstalled(installed);
+      if (installed) {
+        setConnectionMethod('extension');
+      } else if (mobile) {
+        setConnectionMethod('deep-link');
+      } else {
+        setConnectionMethod('none');
+      }
+    });
+  }, []);
 
   const connect = useCallback(async () => {
     setIsConnecting(true);
     setConnectError(null);
 
     try {
-      // Check installation first so we can show the install link (Req 9.1)
       const installed = await detectFreighter();
       setFreighterInstalled(installed);
+
+      if (!installed && isMobileDevice()) {
+        const link = getFreighterDeepLink();
+        if (typeof window !== 'undefined') {
+          window.location.href = link;
+        }
+        setConnectError('Redirecting to Freighter mobile app...');
+        return;
+      }
 
       if (!installed) {
         setConnectError(
@@ -63,21 +105,20 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      // Request explicit access — stores ONLY the key from this session (Req 9.3)
       const key = await connectWallet();
       setPublicKey(key);
+      setConnectionMethod('extension');
     } catch (err) {
-      // User denied access or another Freighter error (Req 9.4)
       const msg = err instanceof Error ? err.message : 'Wallet connection failed.';
       setConnectError(msg);
-      setPublicKey(null); // Return to disconnected state (Req 9.4)
+      setPublicKey(null);
     } finally {
       setIsConnecting(false);
     }
   }, []);
 
   const disconnect = useCallback(() => {
-    setPublicKey(null);     // Clears stored key (Req 9.6)
+    setPublicKey(null);
     setConnectError(null);
   }, []);
 
@@ -88,6 +129,9 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isConnecting,
         connectError,
         freighterInstalled,
+        isMobile,
+        connectionMethod,
+        deepLinkUrl,
         connect,
         disconnect,
       }}
