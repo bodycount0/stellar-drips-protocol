@@ -135,6 +135,21 @@ cd frontend
 npm run type-check
 ```
 
+
+### Run unit tests
+
+```bash
+cd frontend
+npm test
+```
+
+### On-chain Analytics & Event History
+
+The frontend includes a real-time event analytics dashboard (`EventHistory` component) querying Stellar Soroban RPC `getEvents`. It features:
+- **KPI Metrics Cards**: Real-time tracking of total subscriptions, settled token volume, and latest synchronized ledger height.
+- **Interactive Event Table**: Filter by lifecycle action (`subscribe`, `executed`, `cancel`), live search across addresses/amounts, and direct deep links to Stellar Expert Explorer.
+- **1-Click CSV Export**: Instant export of protocol events into RFC-compliant CSV files for accounting and financial auditing.
+
 ---
 
 ## Contract entry points
