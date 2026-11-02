@@ -7,6 +7,7 @@
  * Requirements: 9.1, 9.5, 9.6, 10.1
  */
 
+import EventHistory from '@/components/EventHistory';
 import SubscriptionForm from '@/components/SubscriptionForm';
 import { useWallet } from '@/hooks/useWallet';
 
@@ -104,6 +105,8 @@ export default function Home() {
           Connect your wallet above to create a subscription.
         </div>
       )}
+
+      <EventHistory />
     </main>
   );
 }
