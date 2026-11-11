@@ -180,3 +180,13 @@ npm run type-check
 ## License
 
 MIT
+
+
+## On-Chain Subscription Analytics & Event History Viewer (`#4`)
+
+The Next.js frontend includes `EventHistory` (`frontend/src/components/EventHistory.tsx`) and `event_history.ts` (`frontend/src/lib/event_history.ts`) to query, decode, aggregate, paginate, and export Soroban contract lifecycle events (`subscribe` and `executed`) via Stellar RPC `getEvents`:
+
+- **Live Soroban RPC `getEvents` Sync**: Decodes XDR `ScVal` topics `(symbol("subscribe" | "executed"), subscriber, merchant)` and `i128` payment amounts.
+- **Analytics KPI Cards**: Displays total subscriptions created, executed recurring payments, settled volume, unique subscribers/merchants, and latest synced ledger.
+- **Paginated & Filterable Table**: Filter by lifecycle event type or Stellar `G...` address with paginated navigation.
+- **One-Click CSV Export**: Exports filtered event history to an RFC 4180 compliant `.csv` file.
